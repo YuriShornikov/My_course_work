@@ -1,0 +1,2 @@
+access_token = 'vk1.a.Imtn6XG0-BatbsN-DeI0dpeeaExJhyg580Ha77k55xkwXBFtvqPR0BGoRRzgIMHsiKXlHs3kMnmC0NmuNR4LOPC4f1fRFZHJij3ZRoEMv3pylJyle5cqtIy2GG6ZUpgUNmEQ7Ar5OkiaJyUabkcV'
+user_id = 51484145
