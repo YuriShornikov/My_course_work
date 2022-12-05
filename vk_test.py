@@ -15,7 +15,7 @@ class VK:
        return response.json()
 
 
-access_token = 'vk1.a.Imtn6XG0-BatbsN-DeI0dpeeaExJhyg580Ha77k55xkwXBFtvqPR0BGoRRzgIMHsiKXlHs3kMnmC0NmuNR4LOPC4f1fRFZHJij3ZRoEMv3pylJyle5cqtIy2GG6ZUpgUNmEQ7Ar5OkiaJyUabkcV'
+access_token = 'vk1.a.2aPHcgX1vDtWtPNSjinBUOBcbnVMVhWSWGdpVSmVPt149eSSXqU6GTbQ_F6IOV2b_S0rQRhPCCqMSLMa8r0qQ2Mb1P4itHvmEcpIIuqlyoPtwAhfFCdoz7gTgVCAsqoqKk3EhigX-wDA7efHqVrUIodaBjjEccTaYjknQxkNbB24rAxmcP35onAXpsqXtzWziZCOQVk3gMkGkBBGvn_N5Q'
 user_id = 51484145
 vk = VK(access_token, user_id)
 print(vk.users_info())
