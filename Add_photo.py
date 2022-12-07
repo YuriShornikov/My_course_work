@@ -1,5 +1,9 @@
 import requests
 
+import os
+
+from token_ya import TOKEN
+
 from token_vk import access_token
 from token_vk import user_id
 
@@ -8,7 +12,7 @@ from token_vk import user_id
 
 #Получать фото с профиля
 
-class VK:
+# class VK:
 
 #    def __init__(self, access_token, user_id, version='5.131'):
 #        self.token = access_token
@@ -44,7 +48,7 @@ class Yandex:
 
     def get_upload_link(self, path):
         uri ='v1/disk/resources/upload/'
-        url = uri + self.base_host
+        url = self.base_host + uri
         params = {
             'path': path,
             'overwrite': True
@@ -53,15 +57,13 @@ class Yandex:
         print(res.json())
         return res.json()['href']
 
-    def get_upload_disk(self, local_path, file_path):
-        url_disk = self.get_upload_link(file_path)
-        res_disk = requests.put(url_disk, data=open(local_path, 'rb'), headers=self.get_headers())
-        print(res_disk.json())
-        if res_disk.json() ==201:
-            print('Your upload complete')
-
+    def upload(self, local_path, file_path: str):
+        upload_url = self.get_upload_link(file_path)
+        response = requests.put(upload_url, data=open(local_path, 'rb'), headers=self.get_headers())
+        if response.status_code == 201:
+            print('Загрузка успешна')
 
 if __name__ == '__main__':
-    TOKEN = 'y0_AgAAAAAFm3q_AADLWwAAAADUOsbp0lkJ6SxXQZ2CjaM-Ph2t1xcJiwM'
-    test = Yandex(TOKEN)
-    result = test.get_upload_disk('/t1.jpg', '/test.jpg')
+    path_to_file = os.path.join(os.getcwd(), 't1.jpg')
+    uploader = Yandex(TOKEN)
+    result = uploader.upload(path_to_file, 'test.jpg')
