@@ -26,7 +26,7 @@ class VK:
    #     response = requests.get(url, params={**self.params, **params})
    #     return response.json()
 
-   def photos_vk_get(self, offset=0, count=5):
+   def photos_vk_get(self, offset=0, count=1):
        url_photos = 'https://api.vk.com/method/photos.get'
        params = {
            'owner_id': 117971802,
@@ -37,49 +37,80 @@ class VK:
            'count': count,
        }
        res = requests.get(url_photos, params={**self.params, **params}).json()
-       print(res)
+       # print(res)
+       for keys in res["response"]["items"]:
+           file_url = keys["sizes"][-1]["url"]
+           file_name = keys["likes"]["count"]
+           # print(file_name)
+           return file_url, file_name
+
+       # count_photo = res["response"]["count"]
+       # i = 0
+       # count = 5
+       # photo = []
+       # while i <= count_photo:
+       #     if i != 0:
+       #         data = res(offset=i, count=count)
+       #     for files in res["response"]["items"]:
+       #         file_url = files["sizes"][-1]["url"]
+       #         filename = file_url.split("/")[-1]
+       #         photo.append(filename)
+       # print(count_photo)
 
 
-    def
+    # def get_photos(self):
+    #     data = self.photos_vk_get()
+    #     count_photo = data["response"]["count"]
+    #     print(count_photo)
 
 # access_token = 'access_token'
 # user_id = 'user_id'
 vk = VK(access_token, user_id)
 # print(vk.users_info())
-print(vk.photos_vk_get())
+vk_href = vk.photos_vk_get()
+print(vk_href)
+# print(vk.get_photos())
 
 
 # Загрузка файла с компа на диск, необходимо переделать с вк на диск
-# class Yandex:
-#     base_host = 'https://cloud-api.yandex.net/'
-#
-#     def __init__(self, token: str):
-#         self.token = token
-#
-#     def get_headers(self):
-#         return {
-#             'content-type': 'application/json',
-#             'Authorization': f'OAuth {self.token}'
-#         }
-#
-#     def get_upload_link(self, path):
-#         uri ='v1/disk/resources/upload/'
-#         url = self.base_host + uri
-#         params = {
-#             'path': path,
-#             'overwrite': True
-#         }
-#         res = requests.get(url, headers=self.get_headers(), params=params)
-#         print(res.json())
-#         return res.json()['href']
-#
-#     def upload(self, local_path, file_path: str):
-#         upload_url = self.get_upload_link(file_path)
-#         response = requests.put(upload_url, data=open(local_path, 'rb'), headers=self.get_headers())
-#         if response.status_code == 201:
-#             print('Загрузка успешна')
-#
-# if __name__ == '__main__':
-#     path_to_file = os.path.join(os.getcwd(), 't1.jpg')
-#     uploader = Yandex(TOKEN)
-#     result = uploader.upload(path_to_file, 'test.jpg')
+class Yandex:
+    base_host = 'https://cloud-api.yandex.net/'
+
+    def __init__(self, token: str):
+        self.token = token
+
+    def get_headers(self):
+        return {
+            'content-type': 'application/json',
+            'Authorization': f'OAuth {self.token}'
+        }
+
+    def get_upload_link(self, ya_path):
+        uri ='v1/disk/resources/upload/'
+        url = self.base_host + uri
+        params = {
+            'path': ya_path,
+            'overwrite': True
+        }
+        res = requests.get(url, headers=self.get_headers(), params=params)
+        print(res.json())
+        return res.json()['href']
+
+    def upload(self, local_path, file_path: str):
+        upload_url = self.get_upload_link(file_path)
+        response = requests.put(upload_url, data=open(local_path, 'rb'), headers=self.get_headers())
+        if response.status_code == 201:
+            print('Загрузка успешна')
+
+    def upload_from_vk(self, vk_url, ya_url):
+        url = 'v1/disk/resources/upload/'
+        upload_url = self.base_host + url
+        params = {'url': vk_url, 'path': ya_url}
+        res = requests.post(upload_url, params=params, headers=self.get_headers())
+        print(res.json())
+
+if __name__ == '__main__':
+    # path_to_file = os.path.join(os.getcwd(), 't1.jpg')
+    uploader = Yandex(TOKEN)
+    # result = uploader.upload(path_to_file, 'test.jpg')
+    uploader.upload_from_vk(vk_href, '/{vk_test}.jpg')
