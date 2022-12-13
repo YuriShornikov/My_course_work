@@ -37,49 +37,43 @@ class VK:
            'count': count,
        }
        res = requests.get(url_photos, params={**self.params, **params}).json()
-       # print(res)
-       # list_photo = []
-       href_photo = {}
-       for keys in res["response"]["items"]:
-           file_url = keys["sizes"][-1]["url"]
-           file_name = keys["likes"]["count"]
-           # list_photo.append(file_url)
-           href_photo[file_name] = file_url
-       # print(href_photo)
-       # print(list_photo)
+       return res
 
-           #
-           #    print(href_photo)
-
-           # print(file_name)
-       # print(href_photo)
-       # return file_url, file_name
-       return href_photo
-
-       # count_photo = res["response"]["count"]
-       # i = 0
-       # count = 5
-       # photo = []
-       # while i <= count_photo:
-       #     if i != 0:
-       #         data = res(offset=i, count=count)
-       #     for files in res["response"]["items"]:
-       #         file_url = files["sizes"][-1]["url"]
-       #         filename = file_url.split("/")[-1]
-       #         photo.append(filename)
-       # print(count_photo)
-
-
-    # def get_photos(self):
-    #     data = self.photos_vk_get()
-    #     count_photo = data["response"]["count"]
-    #     print(count_photo)
+       #
+       # # print(res)
+       # href_photo = {}
+       # for keys in res["response"]["items"]:
+       #     file_url = keys["sizes"][-1]["url"]
+       #     file_name = keys["likes"]["count"]
+       #     href_photo[file_name] = file_url
+       #
+       # return href_photo
 
 # access_token = 'access_token'
 # user_id = 'user_id'
 vk = VK(access_token, user_id)
 # print(vk.users_info())
-vk_href = vk.photos_vk_get()
+my_photos = vk.photos_vk_get()
+# print(my_photos)
+# print(my_photos["response"]["items"])
+def get_photo():
+    my_photos = vk.photos_vk_get()
+    count_photo = my_photos["response"]["count"]
+    i = 0
+    count = 5
+    href_photo = {}
+    while i <= count_photo:
+        if i != 0:
+            my_photos = vk.photos_vk_get(offset=i, count=count)
+        for keys in my_photos["response"]["items"]:
+			file_url = keys["sizes"][-1]["url"]
+			file_name = keys["likes"]["count"]
+            href_photo[file_name] = file_url
+
+
+# vk_href = vk.photos_vk_get()
+# vk_href = vk.photos_vk_get(offset=5, count=5)
+
 
 # print(vk_href)
 # print(vk.get_photos())
@@ -122,11 +116,16 @@ class Yandex:
         res = requests.post(upload_url, params=params, headers=self.get_headers())
         print(res.json())
 
+    def create_folder(self, ya_path):
+        folder_url = self.base_host + 'v1/disk/resources/'
+        params = {'path': ya_path}
+        res = requests.put(folder_url, params=params, headers=self.get_headers())
+
+
 if __name__ == '__main__':
-    # path_to_file = os.path.join(os.getcwd(), 't1.jpg')
     uploader = Yandex(TOKEN)
-    # result = uploader.upload(path_to_file, 'test.jpg')
-    for key, value in vk_href.items():
-        # print(vk_href[key])
-        path = f'/{vk_href[value]}.jpg'
-        uploader.upload_from_vk(vk_href[key], path)
+    # sop = 10
+    # print(vk_href)
+    # uploader.create_folder('vk_photo')
+    # for key, value in vk_href.items():
+    #     uploader.upload_from_vk(vk_href[key], "/vk_photo/%s" % key)
