@@ -26,7 +26,7 @@ class VK:
    #     response = requests.get(url, params={**self.params, **params})
    #     return response.json()
 
-   def photos_vk_get(self, offset=0, count=1):
+   def photos_vk_get(self, offset=0, count=5):
        url_photos = 'https://api.vk.com/method/photos.get'
        params = {
            'owner_id': 117971802,
@@ -38,11 +38,23 @@ class VK:
        }
        res = requests.get(url_photos, params={**self.params, **params}).json()
        # print(res)
+       # list_photo = []
+       href_photo = {}
        for keys in res["response"]["items"]:
            file_url = keys["sizes"][-1]["url"]
            file_name = keys["likes"]["count"]
+           # list_photo.append(file_url)
+           href_photo[file_name] = file_url
+       # print(href_photo)
+       # print(list_photo)
+
+           #
+           #    print(href_photo)
+
            # print(file_name)
-           return file_url, file_name
+       # print(href_photo)
+       # return file_url, file_name
+       return href_photo
 
        # count_photo = res["response"]["count"]
        # i = 0
@@ -68,7 +80,8 @@ class VK:
 vk = VK(access_token, user_id)
 # print(vk.users_info())
 vk_href = vk.photos_vk_get()
-print(vk_href)
+
+# print(vk_href)
 # print(vk.get_photos())
 
 
@@ -113,4 +126,7 @@ if __name__ == '__main__':
     # path_to_file = os.path.join(os.getcwd(), 't1.jpg')
     uploader = Yandex(TOKEN)
     # result = uploader.upload(path_to_file, 'test.jpg')
-    uploader.upload_from_vk(vk_href, '/{vk_test}.jpg')
+    for key, value in vk_href.items():
+        # print(vk_href[key])
+        path = f'/{vk_href[value]}.jpg'
+        uploader.upload_from_vk(vk_href[key], path)
