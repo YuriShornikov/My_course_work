@@ -1,7 +1,5 @@
 import requests
 
-import os
-
 from token_ya import TOKEN
 
 from token_vk import access_token
@@ -19,12 +17,7 @@ class VK:
        self.id = user_id
        self.version = version
        self.params = {'access_token': self.token, 'v': self.version}
-   #
-   # def users_info(self):
-   #     url = 'https://api.vk.com/method/users.get'
-   #     params = {'user_ids': self.id}
-   #     response = requests.get(url, params={**self.params, **params})
-   #     return response.json()
+
 
    def photos_vk_get(self, offset=0, count=5):
        url_photos = 'https://api.vk.com/method/photos.get'
@@ -49,8 +42,6 @@ class VK:
        #
        # return href_photo
 
-# access_token = 'access_token'
-# user_id = 'user_id'
 vk = VK(access_token, user_id)
 # print(vk.users_info())
 my_photos = vk.photos_vk_get()
@@ -58,40 +49,6 @@ my_photos = vk.photos_vk_get()
 # print(my_photos["response"]["items"])
 # def get_photo():
 # my_photos = vk.photos_vk_get()
-count_photo = my_photos["response"]["count"]
-print(count_photo)
-i = 0
-count = 5
-href_photo = {}
-photo = []
-while i <= count_photo:
-    my_photos = vk.photos_vk_get(offset=i, count=count)
-    for keys in my_photos["response"]["items"]:
-        file_url = keys["sizes"][-1]["url"]
-        file_name = keys["likes"]["count"]
-        href_photo[file_name] = file_url
-
-        # photo.append(file_url)
-    print(href_photo)
-    i += 5
-print(href_photo)
-    # if i != 0:
-    #     my_photos = vk.photos_vk_get(offset=i, count=count)
-    # else:
-    #     for keys in my_photos["response"]["items"]:
-	#         file_url = keys["sizes"][-1]["url"]
-    #         photo.append(file_url)
-    #     print(photo)
-		# file_name = keys["likes"]["count"]
-        # href_photo[file_name] = file_url
-
-
-# vk_href = vk.photos_vk_get()
-# vk_href = vk.photos_vk_get(offset=5, count=5)
-
-
-# print(vk_href)
-# print(vk.get_photos())
 
 
 # Загрузка файла с компа на диск, необходимо переделать с вк на диск
@@ -107,23 +64,23 @@ class Yandex:
             'Authorization': f'OAuth {self.token}'
         }
 
-    def get_upload_link(self, ya_path):
-        uri ='v1/disk/resources/upload/'
-        url = self.base_host + uri
-        params = {
-            'path': ya_path,
-            'overwrite': True
-        }
-        res = requests.get(url, headers=self.get_headers(), params=params)
-        print(res.json())
-        return res.json()['href']
+    # def get_upload_link(self, ya_path):
+    #     uri ='v1/disk/resources/upload/'
+    #     url = self.base_host + uri
+    #     params = {
+    #         'path': ya_path,
+    #         'overwrite': True
+    #     }
+    #     res = requests.get(url, headers=self.get_headers(), params=params)
+    #     print(res.json())
+    #     return res.json()['href']
 
-    def upload(self, local_path, file_path: str):
-        upload_url = self.get_upload_link(file_path)
-        response = requests.put(upload_url, data=open(local_path, 'rb'), headers=self.get_headers())
-        if response.status_code == 201:
-            print('Загрузка успешна')
-
+    # def upload(self, local_path, file_path: str):
+    #     upload_url = self.get_upload_link(file_path)
+    #     response = requests.put(upload_url, data=open(local_path, 'rb'), headers=self.get_headers())
+    #     if response.status_code == 201:
+    #         print('Загрузка успешна')
+    #
     def upload_from_vk(self, vk_url, ya_url):
         url = 'v1/disk/resources/upload/'
         upload_url = self.base_host + url
@@ -136,11 +93,41 @@ class Yandex:
         params = {'path': ya_path}
         res = requests.put(folder_url, params=params, headers=self.get_headers())
 
+    def get_public_resources(self, fields):
+        url_public = self.base_host + 'v1/disk/resources/public/'
+        params = {'fields': fields}
+        res = requests.get(url_public, headers=self.get_headers()).json()
+
 
 if __name__ == '__main__':
     uploader = Yandex(TOKEN)
-    # sop = 10
+
+    # count_photo = my_photos["response"]["count"]
+    count_photo = 4
+    print(count_photo)
+    i = 0
+    count = 5
+
+    photo = []
+    while i <= count_photo:
+        my_photos = vk.photos_vk_get(offset=i, count=count)
+        href_photo = {}
+        for keys in my_photos["response"]["items"]:
+
+            uploader.create_folder('vk_photo')
+            file_url = keys["sizes"][-1]["url"]
+            file_name = keys["likes"]["count"]
+            href_photo[file_name] = file_url
+
+        for key, value in href_photo.items():
+            uploader.upload_from_vk(href_photo[key], "/vk_photo/%s" % key)
+        print(href_photo)
+        i += 5
+    # print(href_photo)
+
+    final = uploader.get_public_resources()
+    print(final)
     # print(vk_href)
-    # uploader.create_folder('vk_photo')
+    #
     # for key, value in vk_href.items():
     #     uploader.upload_from_vk(vk_href[key], "/vk_photo/%s" % key)
