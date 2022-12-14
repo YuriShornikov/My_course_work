@@ -56,19 +56,34 @@ vk = VK(access_token, user_id)
 my_photos = vk.photos_vk_get()
 # print(my_photos)
 # print(my_photos["response"]["items"])
-def get_photo():
-    my_photos = vk.photos_vk_get()
-    count_photo = my_photos["response"]["count"]
-    i = 0
-    count = 5
-    href_photo = {}
-    while i <= count_photo:
-        if i != 0:
-            my_photos = vk.photos_vk_get(offset=i, count=count)
-        for keys in my_photos["response"]["items"]:
-			file_url = keys["sizes"][-1]["url"]
-			file_name = keys["likes"]["count"]
-            href_photo[file_name] = file_url
+# def get_photo():
+# my_photos = vk.photos_vk_get()
+count_photo = my_photos["response"]["count"]
+print(count_photo)
+i = 0
+count = 5
+href_photo = {}
+photo = []
+while i <= count_photo:
+    my_photos = vk.photos_vk_get(offset=i, count=count)
+    for keys in my_photos["response"]["items"]:
+        file_url = keys["sizes"][-1]["url"]
+        file_name = keys["likes"]["count"]
+        href_photo[file_name] = file_url
+
+        # photo.append(file_url)
+    print(href_photo)
+    i += 5
+print(href_photo)
+    # if i != 0:
+    #     my_photos = vk.photos_vk_get(offset=i, count=count)
+    # else:
+    #     for keys in my_photos["response"]["items"]:
+	#         file_url = keys["sizes"][-1]["url"]
+    #         photo.append(file_url)
+    #     print(photo)
+		# file_name = keys["likes"]["count"]
+        # href_photo[file_name] = file_url
 
 
 # vk_href = vk.photos_vk_get()
