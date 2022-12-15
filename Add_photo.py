@@ -5,8 +5,8 @@ from token_ya import TOKEN
 from token_vk import access_token
 from token_vk import user_id
 
-# from token import TOKEN
 
+import json
 
 #Получать фото с профиля
 
@@ -30,26 +30,10 @@ class VK:
            'count': count,
        }
        res = requests.get(url_photos, params={**self.params, **params}).json()
-       return res
-
-       #
-       # # print(res)
-       # href_photo = {}
-       # for keys in res["response"]["items"]:
-       #     file_url = keys["sizes"][-1]["url"]
-       #     file_name = keys["likes"]["count"]
-       #     href_photo[file_name] = file_url
-       #
-       # return href_photo
 
 vk = VK(access_token, user_id)
-# print(vk.users_info())
-my_photos = vk.photos_vk_get()
-# print(my_photos)
-# print(my_photos["response"]["items"])
-# def get_photo():
-# my_photos = vk.photos_vk_get()
 
+my_photos = vk.photos_vk_get()
 
 # Загрузка файла с компа на диск, необходимо переделать с вк на диск
 class Yandex:
@@ -63,71 +47,45 @@ class Yandex:
             'content-type': 'application/json',
             'Authorization': f'OAuth {self.token}'
         }
-
-    # def get_upload_link(self, ya_path):
-    #     uri ='v1/disk/resources/upload/'
-    #     url = self.base_host + uri
-    #     params = {
-    #         'path': ya_path,
-    #         'overwrite': True
-    #     }
-    #     res = requests.get(url, headers=self.get_headers(), params=params)
-    #     print(res.json())
-    #     return res.json()['href']
-
-    # def upload(self, local_path, file_path: str):
-    #     upload_url = self.get_upload_link(file_path)
-    #     response = requests.put(upload_url, data=open(local_path, 'rb'), headers=self.get_headers())
-    #     if response.status_code == 201:
-    #         print('Загрузка успешна')
     #
     def upload_from_vk(self, vk_url, ya_url):
         url = 'v1/disk/resources/upload/'
         upload_url = self.base_host + url
         params = {'url': vk_url, 'path': ya_url}
-        res = requests.post(upload_url, params=params, headers=self.get_headers())
-        print(res.json())
+        res = requests.post(upload_url, params=params, headers=self.get_headers()).json()
+        # return res
 
     def create_folder(self, ya_path):
         folder_url = self.base_host + 'v1/disk/resources/'
         params = {'path': ya_path}
         res = requests.put(folder_url, params=params, headers=self.get_headers())
 
-    def get_public_resources(self, fields):
-        url_public = self.base_host + 'v1/disk/resources/public/'
-        params = {'fields': fields}
-        res = requests.get(url_public, headers=self.get_headers()).json()
 
 
 if __name__ == '__main__':
     uploader = Yandex(TOKEN)
 
-    # count_photo = my_photos["response"]["count"]
-    count_photo = 4
+    count_photo = my_photos["response"]["count"]
     print(count_photo)
     i = 0
     count = 5
-
     photo = []
     while i <= count_photo:
         my_photos = vk.photos_vk_get(offset=i, count=count)
         href_photo = {}
+        photo_data ={}
         for keys in my_photos["response"]["items"]:
-
-            uploader.create_folder('vk_photo')
             file_url = keys["sizes"][-1]["url"]
+            uploader.create_folder('vk_photo')
             file_name = keys["likes"]["count"]
             href_photo[file_name] = file_url
+            photo_data = {"file_name": f"{file_name}.jpg", "size": keys["sizes"][0]["type"]}
+            photo.append(photo_data)
 
+        photo_json = json.dumps(photo, indent=1)
         for key, value in href_photo.items():
             uploader.upload_from_vk(href_photo[key], "/vk_photo/%s" % key)
         print(href_photo)
         i += 5
-    # print(href_photo)
+    print(photo_json)
 
-    final = uploader.get_public_resources()
-    print(final)
-    # print(vk_href)
-    #
-    # for key, value in vk_href.items():
-    #     uploader.upload_from_vk(vk_href[key], "/vk_photo/%s" % key)
