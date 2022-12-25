@@ -1,4 +1,5 @@
 TOKEN = 'y0_AgAAAAAFm3q_AADLWwAAAADUOsbp0lkJ6SxXQZ2CjaM-Ph2t1xcJiwM'
+vk_id = 117971802
 
 import requests
 
@@ -45,3 +46,4 @@ import requests
 #     if response.status_code == 201:
 #         print('Загрузка успешна')
 
+# input('Введите id:')
