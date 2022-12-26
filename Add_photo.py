@@ -4,6 +4,8 @@ from token_ya import TOKEN
 
 import json
 
+import datetime
+
 #Подгружаем токен, id приложения, id пользователя
 from token_vk import access_token
 from token_vk import user_id
@@ -79,9 +81,11 @@ if __name__ == '__main__':
         href_photo = {}    #словарь для передачи на диск
         photo_data ={}    #словарь для вывода инфы итоговой
         for keys in my_photos["response"]["items"]:
+            seconds = datetime.datetime.fromtimestamp(keys["date"])    #получаем дату в секундах
+            date_key = seconds.strftime('%d.%m.%Y')    #получаем дату
             file_url = keys["sizes"][-1]["url"]    #получаем ссылку с вк для 1 фотки
             uploader.create_folder('vk_photo')    #создаем папку
-            file_name = keys["likes"]["count"]    #имя для 1 фото
+            file_name = str(keys["likes"]["count"]) + '_' + str(date_key)   #имя для 1 фото с датой
             href_photo[file_name] = file_url    #добавляем в словарь для яндекса
             photo_data = {"file_name": f"{file_name}.jpg", "size": keys["sizes"][0]["type"]}    #в словарь для ответа
             photo.append(photo_data)    #добавляем в список для ответа
@@ -89,9 +93,9 @@ if __name__ == '__main__':
 
         with open('results.txt', 'w') as outfile:
             photo_json = json.dump(photo, outfile)  # создаем json для ответа
-        # for key, value in href_photo.items():
-        #     uploader.upload_from_vk(href_photo[key], "/vk_photo/%s" % key)    #передаем фото по ссылке на яндекс диск с именем
-        # print(href_photo)    #вывод словарей с 5 фотками для отправки
+        for key, value in href_photo.items():
+            uploader.upload_from_vk(href_photo[key], "/vk_photo/%s" % key)    #передаем фото по ссылке на яндекс диск с именем
+        print(href_photo)    #вывод словарей с 5 фотками для отправки
         i += 5
-    print(photo_json)    #вывод ответа
+    # print(photo_json)    #вывод ответа
 
